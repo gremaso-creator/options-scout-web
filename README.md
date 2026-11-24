@@ -26,3 +26,8 @@ All imported report processing happens **locally in your browser**. Reports rema
 ## Live search (requires private backend setup)
 
 The **Find Options** button can now call a separately deployed Cloudflare Worker over HTTPS when you enter its URL and the personal scanner access key in the website form. The secure Worker code and deployment instructions are in the **private** `Options-scout` repository at `cloudflare/scout-worker.js` (no secrets in this public repository). A production Tradier data token and a Cloudflare Worker deployment are required. Until they are configured, the site remains report-import/demo mode. The public frontend must never contain your Tradier token. No trading API or brokerage order execution is integrated.
+
+
+## Free historical options feed
+
+The frontend now includes a ticker selector and supports the optional **MarketData.app Free Forever** Cloudflare Worker in the private `Options-scout/cloudflare/scout-marketdata-free.js` file. This feed is **at least 24 hours delayed** and limited to 100 daily API credits. Never treat its options prices as current Robinhood execution prices. **0DTE research results are disabled for this free feed.** The frontend can still import existing private scanner JSON reports manually.
