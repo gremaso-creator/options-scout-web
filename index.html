@@ -38,9 +38,11 @@ footer{color:#8096b4;font-size:12px;line-height:1.6;margin-top:28px}
 <div class="field"><label>Direction</label><div class="segment" id="direction"><button data-value="BOTH" class="selected">Both</button><button data-value="CALL">Calls</button><button data-value="PUT">Puts</button></div></div>
 <div class="field"><label for="expiry">Expiration</label><select id="expiry"><option value="all">All available</option><option value="0">0DTE • Same day</option><option value="1-7">1–7 days</option><option value="8-30" selected>8–30 days</option><option value="31-60">31–60 days</option></select></div>
 <div class="field"><label for="risk">Maximum research risk score</label><select id="risk"><option value="100">Show all risk levels</option><option value="70">70 / 100</option><option value="50">50 / 100</option><option value="30">30 / 100</option></select></div>
+<div class="field"><label for="endpoint">Live scanner endpoint (Cloudflare Worker)</label><input id="endpoint" type="url" inputmode="url" placeholder="https://your-worker.workers.dev"><p class="hint">Set this once after deploying the private backend. Stored on this device.</p></div>
+<div class="field"><label for="accessKey">Scanner access key</label><input id="accessKey" type="password" autocomplete="off" placeholder="Enter your private access key"><p class="hint">Kept for this browser session, never saved in the public GitHub code.</p></div>
 <button class="btn" id="find">Find Options →</button>
-<div class="warn" id="warning" hidden>0DTE requires fresh, trustworthy quotes. The current GitHub scanner only checks 10–35 days to expiration. The app will not fabricate same-day contracts.</div>
-<p class="small">To search, load the latest <strong>latest_report.json</strong> downloaded from GitHub Actions. Your file is processed in your browser.</p>
+<div class="warn" id="warning" hidden>0DTE is extremely risky. A live search requires a working options-data backend, supported listed expirations, and verified broker quotes. A filter is not a recommendation.</div>
+<p class="small">When the backend is configured, Find Options requests a fresh data snapshot. Otherwise, load <strong>latest_report.json</strong> from GitHub Actions for report-only research.</p>
 <div class="source"><label for="file">↑ Load report JSON<input type="file" id="file" accept=".json,application/json"></label><button class="tag secondary" id="demo" style="cursor:pointer">Try demo data</button></div>
 <p class="status" id="status">No report loaded yet.</p></section>
 <section class="panel"><div class="results-head"><h2>Contract research</h2><span class="count" id="count">0 found</span></div>
@@ -69,7 +71,7 @@ function normalize(data){
    const d=Number.isFinite(Number(o.days_to_expiry))?Number(o.days_to_expiry):Math.ceil((Date.parse(o.expiration+"T16:00:00")-Date.parse(String(data.checked_at_et||"").slice(0,10)+"T16:00:00"))/86400000);
    const cost=ask*100;
    if(![ask,strike,spot,d].every(Number.isFinite)||ask<=0||strike<=0||spot<=0||d<0||cost<=0)continue;
-   found.push({sym,side,ask,strike,spot,d,expiration:String(o.expiration||""),cost,spread_pct:Number(o.spread_pct),otm_pct:Number(o.otm_pct),volume:Number(o.volume),open_interest:Number(o.open_interest),quote_unverified:true});
+   found.push({sym,side,ask,strike,spot,d,expiration:/^\\d{4}-\\d{2}-\\d{2}$/.test(String(o.expiration||""))?String(o.expiration):"unknown",cost,spread_pct:Number(o.spread_pct),otm_pct:Number(o.otm_pct),volume:Number(o.volume),open_interest:Number(o.open_interest),quote_unverified:true});
   }
  }
  return found;
@@ -112,7 +114,32 @@ $("budget").addEventListener("input",e=>syncBudget(e.target.value,true));
 $("budgetAmount").addEventListener("input",e=>syncBudget(e.target.value));
 $("direction").addEventListener("click",e=>{const b=e.target.closest("button[data-value]");if(!b)return;direction=b.dataset.value;for(const el of $("direction").querySelectorAll("button"))el.classList.toggle("selected",el===b);});
 $("expiry").addEventListener("change",e=>{$("warning").hidden=e.target.value!=="0";});
-$("find").addEventListener("click",render);
+$("endpoint").value=localStorage.getItem("scoutWorkerEndpoint")||"";
+$("accessKey").value=sessionStorage.getItem("scoutWorkerAccessKey")||"";
+$("endpoint").addEventListener("change",()=>localStorage.setItem("scoutWorkerEndpoint",$("endpoint").value.trim()));
+$("accessKey").addEventListener("change",()=>sessionStorage.setItem("scoutWorkerAccessKey",$("accessKey").value));
+$("find").addEventListener("click",async ()=>{
+ const url=$("endpoint").value.trim();
+ if(!url){render();if(!report)$("status").textContent="To run fresh scans, configure your Cloudflare Worker endpoint and access key; otherwise load a report.";return;}
+ const key=$("accessKey").value.trim();
+ if(!/^https:\/\/[a-z0-9.-]+(?:\/[a-z0-9_\/-]*)?$/i.test(url)){$("status").textContent="Enter a valid HTTPS backend URL.";return;}
+ if(!key){$("status").textContent="Enter your private scanner access key.";return;}
+ const maxPremium=Number($("budgetAmount").value);
+ if(!Number.isFinite(maxPremium)||maxPremium<=0){$("status").textContent="Enter a valid positive budget.";return;}
+ localStorage.setItem("scoutWorkerEndpoint",url);
+ sessionStorage.setItem("scoutWorkerAccessKey",key);
+ const b=$("find");b.disabled=true;b.textContent="Scanning market…";$("status").textContent="Requesting a new options snapshot. Data availability depends on your provider.";
+ try{
+  const resp=await fetch(url.replace(/\/$/,"")+"/scan",{method:"POST",mode:"cors",credentials:"omit",cache:"no-store",headers:{"Content-Type":"application/json","X-Scout-Key":key},body:JSON.stringify({maxPremium,direction,expiry:$("expiry").value})});
+  const result=await resp.json();
+  if(!resp.ok)throw Error(result.error||"Backend error "+resp.status);
+  normalize(result);
+  report=result;demo=false;
+  $("status").textContent=formatReport()+(result.warnings?.length?" • "+result.warnings.length+" source warnings":"");
+  render();
+ }catch(err){$("status").textContent="Scan unavailable: "+String(err.message||err);$("results").innerHTML='<div class="empty"><strong>Live search could not finish</strong>Check the access key, backend setup, market hours, and provider credentials. No trade recommendation was produced.</div>';$("count").textContent="0 found";}
+ finally{b.disabled=false;b.textContent="Find Options →";}
+});
 $("file").addEventListener("change",async e=>{const file=e.target.files?.[0];if(!file)return;try{const parsed=JSON.parse(await file.text());normalize(parsed);report=parsed;demo=false;$("status").textContent=formatReport();render();}catch(err){$("status").textContent="Could not load report: "+err.message;}});
 $("demo").addEventListener("click",()=>{const dt=new Date().toISOString().slice(0,10);report={checked_at_et:dt+"T12:00:00-05:00",data:"SYNTHETIC DEMO — NOT MARKET DATA",candidates:[{symbol:"DEMO",side:"CALL",stock_price:100,option_candidates:[{ask:.25,strike:102,expiration:dt,days_to_expiry:0,spread_pct:12,otm_pct:2,volume:500,open_interest:2000},{ask:.42,strike:103,expiration:"2026-12-04",days_to_expiry:10,spread_pct:9,otm_pct:3,volume:120,open_interest:900}]},{symbol:"TEST",side:"PUT",stock_price:90,option_candidates:[{ask:.33,strike:88,expiration:"2026-12-04",days_to_expiry:10,spread_pct:8,otm_pct:2.2,volume:300,open_interest:1000}]}]};demo=true;$("status").textContent=formatReport();$("expiry").value="all";$("warning").hidden=true;render();});
 </script></body></html>
