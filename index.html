@@ -35,19 +35,20 @@ footer{color:#8096b4;font-size:12px;line-height:1.6;margin-top:28px}
 <div class="eyebrow">Your options research desk</div><h1>Find contracts that fit your budget.</h1><p class="sub">Filter actual scanner reports, compare liquidity and estimated risk, and explore expiration profit/loss scenarios. Never an automatic buy signal.</p>
 <div class="layout"><section class="panel"><h2>Find Options</h2>
 <div class="field"><label for="budgetAmount">Maximum premium per contract (USD)</label><div class="money"><strong id="budgetText">$50.00</strong><span class="hint">Per standard 100-share contract</span></div><input id="budgetAmount" type="number" inputmode="decimal" min="0.01" step="0.01" value="50" aria-label="Custom maximum contract premium in dollars"><p class="hint">Enter any positive budget, including amounts above $100.</p><input id="budget" type="range" min="1" max="1000" step="1" value="50" aria-label="Quick budget slider"></div>
+<div class="field"><label for="symbol">Stock to research (free historical data)</label><select id="symbol"><option>SPY</option><option>QQQ</option><option>SOFI</option><option>NVDA</option><option>AMD</option><option>PLTR</option><option>AAPL</option><option>F</option><option>BAC</option><option>INTC</option></select><p class="hint">One ticker per scan to conserve free daily API credits.</p></div>
 <div class="field"><label>Direction</label><div class="segment" id="direction"><button data-value="BOTH" class="selected">Both</button><button data-value="CALL">Calls</button><button data-value="PUT">Puts</button></div></div>
 <div class="field"><label for="expiry">Expiration</label><select id="expiry"><option value="all">All available</option><option value="0">0DTE • Same day</option><option value="1-7">1–7 days</option><option value="8-30" selected>8–30 days</option><option value="31-60">31–60 days</option></select></div>
 <div class="field"><label for="risk">Maximum research risk score</label><select id="risk"><option value="100">Show all risk levels</option><option value="70">70 / 100</option><option value="50">50 / 100</option><option value="30">30 / 100</option></select></div>
 <div class="field"><label for="endpoint">Live scanner endpoint (Cloudflare Worker)</label><input id="endpoint" type="url" inputmode="url" placeholder="https://your-worker.workers.dev"><p class="hint">Set this once after deploying the private backend. Stored on this device.</p></div>
 <div class="field"><label for="accessKey">Scanner access key</label><input id="accessKey" type="password" autocomplete="off" placeholder="Enter your private access key"><p class="hint">Kept for this browser session, never saved in the public GitHub code.</p></div>
 <button class="btn" id="find">Find Options →</button>
-<div class="warn" id="warning" hidden>0DTE is extremely risky. A live search requires a working options-data backend, supported listed expirations, and verified broker quotes. A filter is not a recommendation.</div>
-<p class="small">When the backend is configured, Find Options requests a fresh data snapshot. Otherwise, load <strong>latest_report.json</strong> from GitHub Actions for report-only research.</p>
+<div class="warn" id="warning" hidden>0DTE is disabled for the free historical data source. Same-day options require current Robinhood quotes; this app cannot produce actionable 0DTE signals.</div>
+<p class="small">When the backend is configured, Find Options fetches a historical snapshot (at least 24 hours delayed), NOT a live trading signal. Otherwise, load <strong>latest_report.json</strong> from GitHub Actions for report-only research.</p>
 <div class="source"><label for="file">↑ Load report JSON<input type="file" id="file" accept=".json,application/json"></label><button class="tag secondary" id="demo" style="cursor:pointer">Try demo data</button></div>
 <p class="status" id="status">No report loaded yet.</p></section>
 <section class="panel"><div class="results-head"><h2>Contract research</h2><span class="count" id="count">0 found</span></div>
 <div id="results"><div class="empty"><strong>Ready to explore</strong>Load a report or try the clearly labeled demo, then select your filters and tap Find Options.</div></div></section></div>
-<footer>Options Scout is not an investment adviser. Scanner prices may be stale or inaccurate. Risk scores are experimental heuristics, not probabilities. Maximum loss for a purchased standard call or put is the premium plus fees; early exercise and expiration handling may create additional obligations. Confirm live bid/ask, contract deliverable, account permissions and risk in Robinhood before trading. No brokerage connection or order placement.</footer></main>
+<footer>Options Scout is not an investment adviser. Scanner prices may be stale or inaccurate. Risk scores are experimental heuristics, not probabilities. Maximum loss for a purchased standard call or put is the premium plus fees; early exercise and expiration handling may create additional obligations. Confirm live bid/ask, contract deliverable, account permissions and risk in Robinhood before trading. No brokerage connection or order placement. Free MarketData.app quotes are at least 24 hours delayed and unsuitable for same-day execution decisions.</footer></main>
 <script>
 "use strict";
 const $=id=>document.getElementById(id);
@@ -128,14 +129,14 @@ $("find").addEventListener("click",async ()=>{
  if(!Number.isFinite(maxPremium)||maxPremium<=0){$("status").textContent="Enter a valid positive budget.";return;}
  localStorage.setItem("scoutWorkerEndpoint",url);
  sessionStorage.setItem("scoutWorkerAccessKey",key);
- const b=$("find");b.disabled=true;b.textContent="Scanning market…";$("status").textContent="Requesting a new options snapshot. Data availability depends on your provider.";
+ const b=$("find");b.disabled=true;b.textContent="Loading historical options…";$("status").textContent="Requesting historical options data. Free quotes are at least 24 hours old.";
  try{
-  const resp=await fetch(url.replace(/\/$/,"")+"/scan",{method:"POST",mode:"cors",credentials:"omit",cache:"no-store",headers:{"Content-Type":"application/json","X-Scout-Key":key},body:JSON.stringify({maxPremium,direction,expiry:$("expiry").value})});
+  const resp=await fetch(url.replace(/\/$/,"")+"/scan",{method:"POST",mode:"cors",credentials:"omit",cache:"no-store",headers:{"Content-Type":"application/json","X-Scout-Key":key},body:JSON.stringify({maxPremium,direction,expiry:$("expiry").value,symbol:$("symbol").value})});
   const result=await resp.json();
   if(!resp.ok)throw Error(result.error||"Backend error "+resp.status);
   normalize(result);
   report=result;demo=false;
-  $("status").textContent=formatReport()+(result.warnings?.length?" • "+result.warnings.length+" source warnings":"");
+  $("status").textContent=(result.historical_only?"HISTORICAL ONLY • ":"")+formatReport()+(result.quote_newest?" • Last option quote: "+result.quote_newest:"")+(result.warnings?.length?" • "+result.warnings.length+" source warnings":"");
   render();
  }catch(err){$("status").textContent="Scan unavailable: "+String(err.message||err);$("results").innerHTML='<div class="empty"><strong>Live search could not finish</strong>Check the access key, backend setup, market hours, and provider credentials. No trade recommendation was produced.</div>';$("count").textContent="0 found";}
  finally{b.disabled=false;b.textContent="Find Options →";}
