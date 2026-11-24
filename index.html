@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0a1020"><title>Options Scout • Research</title>
+<style>
+:root{color-scheme:dark;font-family:Inter,system-ui,-apple-system,sans-serif;background:#080e1b;color:#eef3ff}*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(ellipse at 90% 0%,#1b3155 0%,#080e1b 48%);min-height:100vh}
+main{max-width:1020px;margin:auto;padding:24px 17px 68px}.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:30px}
+.brand{display:flex;align-items:center;gap:12px;font-size:21px;font-weight:850;letter-spacing:-.7px}.mark{display:grid;place-items:center;background:#a2ffce;color:#06261a;border-radius:13px;height:42px;width:42px;font-size:25px}
+.tag{border:1px solid #34455e;color:#aebdd4;border-radius:20px;padding:6px 10px;font-size:11px;white-space:nowrap}
+.eyebrow{color:#8ca8cf;font-size:12px;font-weight:750;letter-spacing:1.6px;text-transform:uppercase;margin-bottom:10px}
+h1{font-size:clamp(30px,5vw,52px);line-height:1.08;letter-spacing:-1.6px;margin:0 0 12px;max-width:800px}
+.sub{color:#9eb0cd;font-size:15px;line-height:1.5;max-width:650px;margin:0 0 24px}
+.layout{display:grid;grid-template-columns:minmax(270px,330px) minmax(0,1fr);gap:17px;align-items:start}
+.panel{background:#121d30;border:1px solid #28364d;border-radius:20px;padding:20px;box-shadow:0 10px 34px #0002}.panel h2{font-size:16px;margin:0 0 20px}
+.field{margin:0 0 20px}.field label{display:block;color:#c1cde0;font-weight:650;font-size:13px;margin-bottom:10px}
+.money{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:10px}.money strong{font-size:34px;letter-spacing:-1px}.hint{font-size:12px;color:#90a4c1}
+input[type=range]{width:100%;accent-color:#a2ffce}select,input[type=number]{width:100%;padding:12px;background:#0b1527;color:#f1f5ff;border:1px solid #34455e;border-radius:10px;font-size:14px}
+.segment{display:flex;gap:6px;background:#0b1527;padding:5px;border-radius:12px}.segment button{flex:1;border:0;border-radius:9px;padding:11px 5px;color:#aebbd0;background:transparent;font-weight:700;cursor:pointer}
+.segment button.selected{background:#304b62;color:white}.btn{background:#a2ffce;border:0;color:#092719;border-radius:12px;padding:15px 16px;width:100%;font-weight:800;font-size:15px;cursor:pointer}
+.secondary{background:#263951;color:#e5efff}.small{font-size:12px;color:#91a5c1;line-height:1.55}.warn{border:1px solid #866536;background:#3f301e;color:#fbd69a;padding:11px 12px;border-radius:12px;font-size:12px;line-height:1.45;margin:12px 0}
+.source{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0}.source label{display:inline-block;border:1px solid #3a4e69;border-radius:10px;padding:12px 14px;cursor:pointer;font-size:13px;font-weight:700}.source input{display:none}
+.status{font-size:12px;color:#aabbd4;margin:0 0 14px}.results-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}.results-head h2{margin:0;font-size:18px}.count{color:#a2ffce;font-size:13px;font-weight:800}
+.empty{padding:40px 22px;border:1px dashed #3e5370;border-radius:15px;text-align:center;color:#a9bad3;line-height:1.55}.empty strong{display:block;color:#e8efff;margin-bottom:7px}
+.contract{border:1px solid #314359;background:#10192a;border-radius:15px;padding:16px;margin-bottom:12px}
+.line{display:flex;justify-content:space-between;align-items:center;gap:10px}.sym{font-size:18px;font-weight:850;letter-spacing:.1px}
+.badge{font-size:11px;border:1px solid #446078;padding:5px 7px;border-radius:16px;color:#c1d0e3}.badge.high{color:#ffc98a;border-color:#795b3b}
+.metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:15px 0}.metric span{display:block;font-size:11px;color:#94a6c1;margin-bottom:4px}.metric b{font-size:17px}
+.detail{background:#0b1526;border-radius:11px;padding:12px;font-size:12px;line-height:1.8;color:#c6d3e8}
+.detail strong{color:#f5f8ff}.details-toggle{background:transparent;border:0;color:#a2ffce;font-weight:700;padding:12px 0 0;cursor:pointer}
+.risktrack{height:7px;background:#30435a;border-radius:6px;overflow:hidden;margin:10px 0}.risktrack div{height:100%;background:linear-gradient(90deg,#9ef7bb,#f0c273,#ef8178)}
+.scenarios{border-top:1px solid #30435a;margin-top:14px;padding-top:12px}.scenario{display:flex;justify-content:space-between;font-size:12px;padding:5px 0}.positive{color:#9ef7bb}.negative{color:#ff9e9e}
+footer{color:#8096b4;font-size:12px;line-height:1.6;margin-top:28px}
+@media(max-width:720px){.layout{grid-template-columns:1fr}main{padding-top:18px}.top{margin-bottom:22px}.panel{padding:17px}}
+</style></head>
+<body><main><header class="top"><div class="brand"><span class="mark">↗</span><span>OPTIONS SCOUT</span></div><span class="tag">RESEARCH ONLY • MVP</span></header>
+<div class="eyebrow">Your options research desk</div><h1>Find contracts that fit your budget.</h1><p class="sub">Filter actual scanner reports, compare liquidity and estimated risk, and explore expiration profit/loss scenarios. Never an automatic buy signal.</p>
+<div class="layout"><section class="panel"><h2>Find Options</h2>
+<div class="field"><label for="budgetAmount">Maximum premium per contract (USD)</label><div class="money"><strong id="budgetText">$50.00</strong><span class="hint">Per standard 100-share contract</span></div><input id="budgetAmount" type="number" inputmode="decimal" min="0.01" step="0.01" value="50" aria-label="Custom maximum contract premium in dollars"><p class="hint">Enter any positive budget, including amounts above $100.</p><input id="budget" type="range" min="1" max="1000" step="1" value="50" aria-label="Quick budget slider"></div>
+<div class="field"><label>Direction</label><div class="segment" id="direction"><button data-value="BOTH" class="selected">Both</button><button data-value="CALL">Calls</button><button data-value="PUT">Puts</button></div></div>
+<div class="field"><label for="expiry">Expiration</label><select id="expiry"><option value="all">All available</option><option value="0">0DTE • Same day</option><option value="1-7">1–7 days</option><option value="8-30" selected>8–30 days</option><option value="31-60">31–60 days</option></select></div>
+<div class="field"><label for="risk">Maximum research risk score</label><select id="risk"><option value="100">Show all risk levels</option><option value="70">70 / 100</option><option value="50">50 / 100</option><option value="30">30 / 100</option></select></div>
+<button class="btn" id="find">Find Options →</button>
+<div class="warn" id="warning" hidden>0DTE requires fresh, trustworthy quotes. The current GitHub scanner only checks 10–35 days to expiration. The app will not fabricate same-day contracts.</div>
+<p class="small">To search, load the latest <strong>latest_report.json</strong> downloaded from GitHub Actions. Your file is processed in your browser.</p>
+<div class="source"><label for="file">↑ Load report JSON<input type="file" id="file" accept=".json,application/json"></label><button class="tag secondary" id="demo" style="cursor:pointer">Try demo data</button></div>
+<p class="status" id="status">No report loaded yet.</p></section>
+<section class="panel"><div class="results-head"><h2>Contract research</h2><span class="count" id="count">0 found</span></div>
+<div id="results"><div class="empty"><strong>Ready to explore</strong>Load a report or try the clearly labeled demo, then select your filters and tap Find Options.</div></div></section></div>
+<footer>Options Scout is not an investment adviser. Scanner prices may be stale or inaccurate. Risk scores are experimental heuristics, not probabilities. Maximum loss for a purchased standard call or put is the premium plus fees; early exercise and expiration handling may create additional obligations. Confirm live bid/ask, contract deliverable, account permissions and risk in Robinhood before trading. No brokerage connection or order placement.</footer></main>
+<script>
+"use strict";
+const $=id=>document.getElementById(id);
+let report=null, demo=false, direction="BOTH";
+const money=n=>"$"+Number(n).toFixed(2);
+const riskScore=(o,side)=>{
+  const d=Number(o.days_to_expiry),sp=Number(o.spread_pct),otm=Number(o.otm_pct);
+  const vol=Number(o.volume),oi=Number(o.open_interest);
+  let score=20+(d===0?48:d<=3?35:d<=7?26:d<=14?16:d<=30?8:3)+Math.min(20,Math.max(0,sp)*.75)+Math.min(18,Math.max(0,otm)*2);
+  if(vol<100)score+=8;if(oi<500)score+=8;
+  return Math.max(0,Math.min(100,Math.round(score)));
+};
+function normalize(data){
+ if(!data||!Array.isArray(data.candidates))throw Error("Expected Options Scout latest_report.json with candidates array.");
+ const found=[];
+ for(const item of data.candidates){
+  const sym=String(item.symbol||"").toUpperCase().replace(/[^A-Z0-9.]/g,"").slice(0,12),side=String(item.side||"").toUpperCase();
+  if(!sym||!["CALL","PUT"].includes(side)||!Array.isArray(item.option_candidates))continue;
+  for(const o of item.option_candidates){
+   const ask=Number(o.ask),strike=Number(o.strike),spot=Number(item.stock_price);
+   const d=Number.isFinite(Number(o.days_to_expiry))?Number(o.days_to_expiry):Math.ceil((Date.parse(o.expiration+"T16:00:00")-Date.parse(String(data.checked_at_et||"").slice(0,10)+"T16:00:00"))/86400000);
+   const cost=ask*100;
+   if(![ask,strike,spot,d].every(Number.isFinite)||ask<=0||strike<=0||spot<=0||d<0||cost<=0)continue;
+   found.push({sym,side,ask,strike,spot,d,expiration:String(o.expiration||""),cost,spread_pct:Number(o.spread_pct),otm_pct:Number(o.otm_pct),volume:Number(o.volume),open_interest:Number(o.open_interest),quote_unverified:true});
+  }
+ }
+ return found;
+}
+function formatReport(){const timestamp=String(report?.checked_at_et||"unknown");return (demo?"DEMO ONLY • ":"")+"Report: "+timestamp+" • "+(report?.data||"unverified option chain");}
+function render(){
+ if(!report){$("results").innerHTML='<div class="empty"><strong>No market data loaded</strong>Import a scanner report or click Try demo data.</div>';$("count").textContent="0 found";return;}
+ let items=normalize(report);const max=Number($("budgetAmount").value),expiry=$("expiry").value,riskLimit=Number($("risk").value);
+ if(!Number.isFinite(max)||max<=0){$("count").textContent="0 found";$("results").innerHTML='<div class="empty"><strong>Enter a valid budget</strong>Use a positive amount in dollars.</div>';return;}
+ items=items.filter(o=>o.cost<=max&&(direction==="BOTH"||o.side===direction)&&
+ (expiry==="all"||(expiry==="0"?o.d===0:(o.d>=Number(expiry.split("-")[0])&&o.d<=Number(expiry.split("-")[1]))))&&riskScore(o,o.side)<=riskLimit);
+ items.sort((a,b)=>riskScore(a,a.side)-riskScore(b,b.side)||a.cost-b.cost);
+ $("count").textContent=items.length+" found";
+ if(!items.length){$("results").innerHTML='<div class="empty"><strong>No matching contracts</strong>Try another expiration or budget. This does not mean the market has no opportunities: the report only contains contracts previously checked by the scanner.</div>';return;}
+ $("results").innerHTML="";
+ for(const o of items.slice(0,30)){
+  const risk=riskScore(o,o.side),card=document.createElement("article");card.className="contract";
+  const payoff=price=>((o.side==="CALL"?Math.max(0,price-o.strike):Math.max(0,o.strike-price))-o.ask)*100;
+  const breakEven=o.side==="CALL"?o.strike+o.ask:o.strike-o.ask;
+  const scenarios=[-.05,0,.05].map(p=>{const price=o.spot*(1+p),pl=payoff(price);return '<div class="scenario"><span>Stock '+(p*100>0?"+":"")+(p*100).toFixed(0)+'% → '+money(price)+'</span><strong class="'+(pl>=0?"positive":"negative")+'">'+(pl>=0?"+":"−")+money(Math.abs(pl))+'</strong></div>';}).join("");
+  card.innerHTML='<div class="line"><span class="sym">'+o.sym+' '+o.side+'</span><span class="badge '+(risk>=70?"high":"")+'">Risk '+risk+'/100</span></div>'+
+   '<div class="metrics"><div class="metric"><span>Indicative premium</span><b>'+money(o.cost)+'</b></div><div class="metric"><span>Strike / expiry</span><b>$'+o.strike.toFixed(2)+' · '+o.d+'D</b></div>'+
+   '<div class="metric"><span>Stock at scan</span><b>'+money(o.spot)+'</b></div><div class="metric"><span>Break-even at expiry</span><b>'+money(breakEven)+'</b></div></div>'+
+   '<div class="risktrack"><div style="width:'+risk+'%"></div></div>'+
+   '<div class="detail"><strong>'+o.expiration+'</strong> · Spread '+(Number.isFinite(o.spread_pct)?o.spread_pct.toFixed(1)+"%":"unknown")+' · OI '+(Number.isFinite(o.open_interest)?o.open_interest:"unknown")+' · Volume '+(Number.isFinite(o.volume)?o.volume:"unknown")+'<br>Max premium loss: '+money(o.cost)+' plus fees. Quote unverified.</div>'+
+   '<button class="details-toggle">Show expiration scenarios ↓</button><div class="scenarios" hidden><div class="small">Hypothetical value at expiration, stock move measured from scan price; excludes fees and changing implied volatility.</div>'+scenarios+'</div>';
+  const toggle=card.querySelector(".details-toggle"),sc=card.querySelector(".scenarios");
+  toggle.addEventListener("click",()=>{sc.hidden=!sc.hidden;toggle.textContent=sc.hidden?"Show expiration scenarios ↓":"Hide scenarios ↑";});
+  $("results").append(card);
+ }
+}
+function syncBudget(value,fromSlider=false){
+ const amount=Number(value);
+ if(!Number.isFinite(amount)||amount<=0){$("budgetText").textContent="Enter budget";return;}
+ if(fromSlider)$("budgetAmount").value=amount.toFixed(2);
+ $("budgetText").textContent=money(amount);
+ $("budget").value=String(Math.min(1000,Math.max(1,amount)));
+}
+$("budget").addEventListener("input",e=>syncBudget(e.target.value,true));
+$("budgetAmount").addEventListener("input",e=>syncBudget(e.target.value));
+$("direction").addEventListener("click",e=>{const b=e.target.closest("button[data-value]");if(!b)return;direction=b.dataset.value;for(const el of $("direction").querySelectorAll("button"))el.classList.toggle("selected",el===b);});
+$("expiry").addEventListener("change",e=>{$("warning").hidden=e.target.value!=="0";});
+$("find").addEventListener("click",render);
+$("file").addEventListener("change",async e=>{const file=e.target.files?.[0];if(!file)return;try{const parsed=JSON.parse(await file.text());normalize(parsed);report=parsed;demo=false;$("status").textContent=formatReport();render();}catch(err){$("status").textContent="Could not load report: "+err.message;}});
+$("demo").addEventListener("click",()=>{const dt=new Date().toISOString().slice(0,10);report={checked_at_et:dt+"T12:00:00-05:00",data:"SYNTHETIC DEMO — NOT MARKET DATA",candidates:[{symbol:"DEMO",side:"CALL",stock_price:100,option_candidates:[{ask:.25,strike:102,expiration:dt,days_to_expiry:0,spread_pct:12,otm_pct:2,volume:500,open_interest:2000},{ask:.42,strike:103,expiration:"2026-12-04",days_to_expiry:10,spread_pct:9,otm_pct:3,volume:120,open_interest:900}]},{symbol:"TEST",side:"PUT",stock_price:90,option_candidates:[{ask:.33,strike:88,expiration:"2026-12-04",days_to_expiry:10,spread_pct:8,otm_pct:2.2,volume:300,open_interest:1000}]}]};demo=true;$("status").textContent=formatReport();$("expiry").value="all";$("warning").hidden=true;render();});
+</script></body></html>
