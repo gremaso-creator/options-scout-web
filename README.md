@@ -21,3 +21,8 @@ All imported report processing happens **locally in your browser**. Reports rema
 - Quotes can be stale or incorrect. The risk score is heuristic, not a prediction or recommendation.
 - No trading, authentication, market-data API keys, or connection to Robinhood.
 - Demo-mode contract prices and symbols are fictional.
+
+
+## Live search (requires private backend setup)
+
+The **Find Options** button can now call a separately deployed Cloudflare Worker over HTTPS when you enter its URL and the personal scanner access key in the website form. The secure Worker code and deployment instructions are in the **private** `Options-scout` repository at `cloudflare/scout-worker.js` (no secrets in this public repository). A production Tradier data token and a Cloudflare Worker deployment are required. Until they are configured, the site remains report-import/demo mode. The public frontend must never contain your Tradier token. No trading API or brokerage order execution is integrated.
